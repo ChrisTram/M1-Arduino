@@ -18,8 +18,8 @@ void print_ip_status(){
 
 void connect_wifi(){
  // Access Point of the infrastructure
-  const char* ssid = "Honor View10";
-  const char *password= "johncena2"; 
+  const char* ssid = "TODOSETIT";
+  const char *password= "TODOSETIT"; 
  
 // const char* ssid = "TP-LINK_6A30";
 // const char *password= "45556753"; 
