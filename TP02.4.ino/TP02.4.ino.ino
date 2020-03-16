@@ -46,6 +46,7 @@ const int LEDpin = 18;
 String LEDState = "off";
 String couleur = "";
 
+
 /* ---- TEMP ---- */
 OneWire oneWire(23); // Pour utiliser une entite oneWire sur le port 23
 DallasTemperature tempSensor(&oneWire) ; // Cette entite est utilisee par le capteur de temperature
@@ -70,6 +71,15 @@ String getTemperature() {
   return String(t);
 }
 
+String getLumin() {
+  int sensorValue;
+  sensorValue = analogRead(A0);
+  Serial.print("Intensité lumineuse:");
+  Serial.print(sensorValue, DEC);
+  return String(sensorValue);
+}
+
+
 /*--------------------------------*/
 void setup() {
   Serial.begin(9600);
@@ -89,7 +99,7 @@ void setup() {
 }
 
 /*--------------------------------*/
-void make_html_response_page(WiFiClient client, String mac, String temperature){
+void make_html_response_page(WiFiClient client, String mac, String temperature, String lumin){
     /*
      * Cette fonction transmet au client la page Web qui forme la reponse 
      * Ã  sa requete.
@@ -118,6 +128,8 @@ void make_html_response_page(WiFiClient client, String mac, String temperature){
     client.println("<h2>Controler la LED, le photoresistor et la temperature via le web.</h2>");
     client.println("<p>Objet Ref : " + mac + "</p>");
     client.println("<p>Temperature : "+ temperature +" </p>");
+    client.println("<p>Luminosite : "+ lumin +" </p>");
+
             
     // Display current state, and ON/OFF buttons for LED
     client.println("<p>Statut de la LED : <font color=" + couleur +">" + LEDState + "</font></p>");
@@ -125,7 +137,9 @@ void make_html_response_page(WiFiClient client, String mac, String temperature){
     // Ctrl buttons
     client.println("<div><a href=\"/ledOn\"><button class=\"buttong\">Push for LED ON</button></a></div>");
     client.println("<div><a href=\"/ledOff\"><button class=\"buttong buttonr\">Push for LED OFF</button></a></div>");
-    client.println("</body></html>");
+    client.println("<form action=\"/setValues\"><label for=\"fname\">Temperature min</label><br><input type=\"number\" id=\"fname\" name=\"fname\" value=\"24\"><br>");
+    client.println("<label for=\"lname\">Luminosite en fin de journee</label><br><input type=\"number\" id=\"lname\" name=\"lname\" value=\"28\"><br><br><input type=\"submit\" value=\"27\">");
+    client.println("</form></body></html>");
             
     // The HTTP response ends with another blank line
     client.println();
@@ -178,7 +192,8 @@ void loop(){
             
             // b) Envoi de le reponse au client
             String temperature = getTemperature();
-            make_html_response_page(client, WiFi.macAddress(),temperature);
+            String lumin = getLumin();
+            make_html_response_page(client, WiFi.macAddress(),temperature, lumin);
           
             // Break out of the while loop
             break;
